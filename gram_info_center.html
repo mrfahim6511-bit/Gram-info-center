@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>গ্রাম তথ্য কেন্দ্র - হাওলাদার পাড়া</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 1rem;
+            overflow-y: auto;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .sidebar h1 {
+            font-size: 20px;
+            margin-bottom: 2rem;
+            text-align: center;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+            padding-bottom: 1rem;
+        }
+
+        .nav-item {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.3);
+            border-left-color: #ffd700;
+            font-weight: 600;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h2 {
+            font-size: 28px;
+            color: #667eea;
+        }
+
+        .admin-toggle {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .admin-toggle:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        .card h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .item-list {
+            list-style: none;
+        }
+
+        .item-list li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        .item-list li:last-child {
+            border-bottom: none;
+        }
+
+        .admin-panel {
+            display: none;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .admin-panel.show {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-right: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .button.primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .button.primary:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .button.secondary {
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .button.secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .button.danger {
+            background: #ff6b6b;
+            color: white;
+            padding: 0.4rem 0.8rem;
+            font-size: 12px;
+        }
+
+        .button.danger:hover {
+            background: #cc5555;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #999;
+        }
+
+        .data-item {
+            background: #f9f9f9;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .data-item-content {
+            flex: 1;
+        }
+
+        .data-item .button.danger {
+            margin: 0;
+        }
+
+        .section-title {
+            font-size: 22px;
+            color: #667eea;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .info-row {
+            margin-bottom: 0.75rem;
+            font-size: 14px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #667eea;
+            display: inline-block;
+            min-width: 120px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                padding: 1rem;
+                display: flex;
+                gap: 1rem;
+                overflow-x: auto;
+                height: auto;
+            }
+
+            .nav-item {
+                flex-shrink: 0;
+                width: auto;
+                white-space: nowrap;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content {
+                padding: 1rem;
+            }
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            border: 1px solid #c3e6cb;
+            animation: slideIn 0.3s ease-in;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- সাইডবার -->
+        <div class="sidebar">
+            <h1>📢 গ্রাম তথ্য কেন্দ্র</h1>
+            <div class="nav-item active" data-section="news">📰 খবর ও ঘোষণা</div>
+            <div class="nav-item" data-section="health">🏥 স্বাস্থ্যসেবা</div>
+            <div class="nav-item" data-section="education">🎓 শিক্ষা</div>
+            <div class="nav-item" data-section="jobs">💼 চাকরি</div>
+            <div class="nav-item" data-section="agriculture">🧑‍🌾 কৃষি</div>
+            <div class="nav-item" data-section="government">🏛️ সেবা</div>
+            <div class="nav-item" data-section="donors">🩸 রক্তদাতা</div>
+            <div class="nav-item" data-section="admin" style="background: rgba(255,215,0,0.2); border-left-color: #ffd700; margin-top: 2rem;">⚙️ অ্যাডমিন</div>
+        </div>
+
+        <!-- মেইন কন্টেন্ট -->
+        <div class="main-content">
+            <div class="header">
+                <h2 id="page-title">📰 খবর ও ঘোষণা</h2>
+                <button class="admin-toggle" onclick="toggleAdmin()">⚙️ অ্যাডমিন প্যানেল</button>
+            </div>
+
+            <div class="content">
+                <!-- খবর সেকশন -->
+                <div id="news" class="section active">
+                    <div id="news-content"></div>
+                </div>
+
+                <!-- স্বাস্থ্য সেকশন -->
+                <div id="health" class="section">
+                    <h3 class="section-title">🏥 হাসপাতাল ও ক্লিনিক</h3>
+                    <div id="health-hospitals" class="grid"></div>
+                    <h3 class="section-title">👨‍⚕️ ডাক্তার</h3>
+                    <div id="health-doctors" class="grid"></div>
+                </div>
+
+                <!-- শিক্ষা সেকশন -->
+                <div id="education" class="section">
+                    <h3 class="section-title">🎓 শিক্ষা প্রতিষ্ঠান</h3>
+                    <div id="education-content" class="grid"></div>
+                </div>
+
+                <!-- চাকরি সেকশন -->
+                <div id="jobs" class="section">
+                    <h3 class="section-title">💼 চাকরির সুযোগ</h3>
+                    <div id="jobs-content" class="grid"></div>
+                </div>
+
+                <!-- কৃষি সেকশন -->
+                <div id="agriculture" class="section">
+                    <h3 class="section-title">🧑‍🌾 কৃষি সেবা</h3>
+                    <div id="agriculture-content" class="grid"></div>
+                </div>
+
+                <!-- সরকারি সেবা সেকশন -->
+                <div id="government" class="section">
+                    <h3 class="section-title">🏛️ সরকারি সেবা</h3>
+                    <div id="government-content" class="grid"></div>
+                </div>
+
+                <!-- রক্তদাতা সেকশন -->
+                <div id="donors" class="section">
+                    <h3 class="section-title">🩸 রক্তদাতা নেটওয়ার্ক</h3>
+                    <div id="donors-content" class="grid"></div>
+                </div>
+
+                <!-- অ্যাডমিন প্যানেল -->
+                <div id="admin" class="section">
+                    <div class="admin-panel" id="admin-panel">
+                        <h2 style="margin-bottom: 2rem; color: #667eea;">⚙️ অ্যাডমিন প্যানেল</h2>
+                        
+                        <div id="success-message"></div>
+
+                        <div class="form-group">
+                            <label>তথ্য যোগ করুন কোথায়?</label>
+                            <select id="category" onchange="updateForm()">
+                                <option value="news">খবর ও ঘোষণা</option>
+                                <option value="health">স্বাস্থ্যসেবা</option>
+                                <option value="education">শিক্ষা</option>
+                                <option value="jobs">চাকরি</option>
+                                <option value="agriculture">কৃষি</option>
+                                <option value="government">সরকারি সেবা</option>
+                                <option value="donors">রক্তদাতা</option>
+                            </select>
+                        </div>
+
+                        <div id="form-fields"></div>
+
+                        <button class="button primary" onclick="addItem()">যোগ করুন</button>
+                        <button class="button secondary" onclick="clearForm()">পরিষ্কার করুন</button>
+
+                        <hr style="margin: 2rem 0; border: none; border-top: 1px solid #ddd;">
+
+                        <h3 style="margin-bottom: 1.5rem; color: #667eea;">সংরক্ষিত তথ্য সমূহ</h3>
+                        <div id="data-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const categories = {
+            news: { fields: ['title', 'date', 'description'] },
+            health: { fields: ['type', 'name', 'phone', 'address'] },
+            education: { fields: ['type', 'name', 'contact', 'info'] },
+            jobs: { fields: ['position', 'organization', 'deadline', 'description'] },
+            agriculture: { fields: ['type', 'content', 'contact'] },
+            government: { fields: ['service', 'process', 'requirements', 'office'] },
+            donors: { fields: ['name', 'blood_group', 'phone', 'area', 'last_donation_date'] }
+        };
+
+        const fieldLabels = {
+            title: 'শিরোনাম',
+            date: 'তারিখ',
+            description: 'বর্ণনা',
+            type: 'ধরন',
+            name: 'নাম',
+            phone: 'ফোন নম্বর',
+            address: 'ঠিকানা',
+            contact: 'যোগাযোগ',
+            info: 'তথ্য',
+            position: 'পদ',
+            organization: 'সংস্থা',
+            deadline: 'শেষ তারিখ',
+            content: 'বিষয়',
+            blood_group: 'রক্তের গ্রুপ',
+            area: 'এলাকা',
+            last_donation_date: 'শেষ দান তারিখ',
+            process: 'প্রক্রিয়া',
+            requirements: 'প্রয়োজনীয়তা',
+            service: 'সেবা',
+            office: 'অফিস'
+        };
+
+        const pageTitles = {
+            news: '📰 খবর ও ঘোষণা',
+            health: '🏥 স্বাস্থ্যসেবা',
+            education: '🎓 শিক্ষা',
+            jobs: '💼 চাকরি ও কর্মসংস্থান',
+            agriculture: '🧑‍🌾 কৃষি',
+            government: '🏛️ সরকারি সেবা',
+            donors: '🩸 রক্তদাতা তালিকা',
+            admin: '⚙️ অ্যাডমিন প্যানেল'
+        };
+
+        let currentSection = 'news';
+        let appData = JSON.parse(localStorage.getItem('gramData')) || {
+            news: [
+                { id: 1, title: 'স্বাগতম গ্রাম তথ্য কেন্দ্রে!', date: new Date().toLocaleDateString('bn-BD'), description: 'এটি আপনার গ্রামের সকল গুরুত্বপূর্ণ তথ্যের জন্য একটি কেন্দ্র। অ্যাডমিন প্যানেল থেকে তথ্য যোগ করুন।' }
+            ],
+            health: [],
+            education: [],
+            jobs: [],
+            agriculture: [],
+            government: [],
+            donors: []
+        };
+
+        // নেভিগেশন ইভেন্ট
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const section = this.getAttribute('data-section');
+                switchSection(section);
+            });
+        });
+
+        function switchSection(section) {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelector(`[data-section="${section}"]`).classList.add('active');
+
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(section).classList.add('active');
+
+            document.getElementById('page-title').textContent = pageTitles[section];
+
+            currentSection = section;
+
+            if (section === 'admin') {
+                document.getElementById('admin-panel').classList.add('show');
+                updateForm();
+                displayData();
+            } else {
+                document.getElementById('admin-panel').classList.remove('show');
+                renderContent(section);
+            }
+        }
+
+        function renderContent(section) {
+            const data = appData[section] || [];
+
+            if (section === 'news') {
+                const content = document.getElementById('news-content');
+                content.innerHTML = data.length ? data.map(item => `
+                    <div class="card">
+                        <h3>${item.title}</h3>
+                        <div class="info-row">
+                            <span class="info-label">তারিখ:</span>
+                            ${item.date}
+                        </div>
+                        <div class="info-row" style="margin-top: 1rem;">
+                            ${item.description}
+                        </div>
+                    </div>
+                `).join('') : '<div class="empty-state"><p>এখনো কোনো খবর নেই</p></div>';
+            }
+
+            else if (section === 'health') {
+                const hospitals = data.filter(d => d.type === 'হাসপাতাল' || d.type === 'ক্লিনিক');
+                document.getElementById('health-hospitals').innerHTML = hospitals.length ? hospitals.map(item => `
+                    <div class="card">
+                        <h3>${item.name}</h3>
+                        <div class="info-row"><span class="info-label">ফোন:</span> ${item.phone}</div>
+                        <div class="info-row"><span class="info-label">ঠিকানা:</span> ${item.address}</div>
+                    </div>
+                `).join('') : '<div class="empty-state">কোনো হাসপাতাল নেই</div>';
+
+                const doctors = data.filter(d => d.type === 'ডাক্তার');
+                document.getElementById('health-doctors').innerHTML = doctors.length ? doctors.map(item => `
+                    <div class="card">
+                        <h3>${item.name}</h3>
+                        <div class="info-row"><span class="info-label">ফোন:</span> ${item.phone}</div>
+                        <div class="info-row"><span class="info-label">ঠিকানা:</span> ${item.address}</div>
+                    </div>
+                `).join('') : '<div class="empty-state">কোনো ডাক্তার নেই</div>';
+            }
+
+            else if (section === 'education') {
+                const content = document.getElementById('education-content');
+                content.innerHTML = data.length ? data.map(item => `
+                    <div class="card">
+                        <h3>${item.name}</h3>
+                        <div class="info-row"><span class="info-label">ধরন:</span> ${item.type}</div>
+                        <div class="info-row"><span class="info-label">যোগাযোগ:</span> ${item.contact}</div>
+                        <div class="info-row"><span class="info-label">তথ্য:</span> ${item.info}</div>
+                    </div>
+                `).join('') : '<div class="empty-state">কোনো তথ্য নেই</div>';
+            }
+
+            else if (section === 'jobs') {
+                const content = document.getElementById('jobs-content');
+                content.innerHTML = data.length ? data.map(item => `
+                    <div class="card">
+                        <h3>${item.position}</h3>
+                        <div class="info-row"><span class="info-label">সংস্থা:</span> ${item.organization}</div>
+                        <div class="info-row"><span class="info-label">শেষ তারিখ:</span> ${item.deadline}</div>
+                        <div class="info-row"><span class="info-label">বিস্তারিত:</span> ${item.description}</div>
+                    </div>
+                `).join('') : '<div class="empty-state">কোনো চাকরির সুযোগ নেই</div>';
+            }
+
+            else if (section === 'agriculture') {
+                const content = document.getElementById('agriculture-content');
+                content.innerHTML = data.length ? data.map(item => `
+                    <div class="card">
+                        <h3>${item.type}</h3>
+                        <div class="info-row">${item.content}</div>
+                        <div class="info-row"><span class="info-label">যোগাযোগ:</span> ${item.contact}</div>
+                    </div>
+                `).join('') : '<div class="empty-state">কোনো তথ্য নেই</div>';
+            }
+
+            else if (section === 'government') {
+                const content = document.getElementById('government-content');
+                content.innerHTML = data.length ? data.map(item => `
+                    <div class="card">
+                        <h3>${item.service}</h3>
+                        <div class="info-row"><span class="info-label">প্রক্রিয়া:</span> ${item.process}</div>
+                        <div class="info-row"><span class="info-label">প্রয়োজনীয়তা:</span> ${item.requirements}</div>
+                        <div class="info-row"><span class="info-label">অফিস:</span> ${item.office}</div>
+                    </div>
+                `).join('') : '<div class="empty-state">কোনো তথ্য নেই</div>';
+            }
+
+            else if (section === 'donors') {
+                const content = document.getElementById('donors-content');
+                content.innerHTML = data.length ? data.map(item => `
+                    <div class="card">
+                        <h3>${item.name} <span class="badge">${item.blood_group}</span></h3>
+                        <div class="info-row"><span class="info-label">ফোন:</span> ${item.phone}</div>
+                        <div class="info-row"><span class="info-label">এলাকা:</span> ${item.area}</div>
+                        <div class="info-row"><span class="info-label">শেষ দান:</span> ${item.last_donation_date}</div>
+                    </div>
+                `).join('') : '<div class="empty-state">কোনো রক্তদাতা নেই</div>';
+            }
+        }
+
+        function updateForm() {
+            const category = document.getElementById('category').value;
+            const fields = categories[category].fields;
+            
+            const html = fields.map(field => `
+                <div class="form-group">
+                    <label>${fieldLabels[field]}</label>
+                    <input type="text" id="field-${field}" placeholder="${fieldLabels[field]} লিখুন">
+                </div>
+            `).join('');
+
+            document.getElementById('form-fields').innerHTML = html;
+        }
+
+        function addItem() {
+            const category = document.getElementById('category').value;
+            const fields = categories[category].fields;
+            
+            const newItem = { id: Date.now() };
+            let valid = true;
+
+            for (let field of fields) {
+                const value = document.getElementById(`field-${field}`)?.value || '';
+                if (!value.trim()) {
+                    valid = false;
+                    break;
+                }
+                newItem[field] = value;
+            }
+
+            if (!valid) {
+                alert('সমস্ত ফিল্ড পূরণ করুন!');
+                return;
+            }
+
+            appData[category].push(newItem);
+            saveData();
+            clearForm();
+            displayData();
+            showSuccessMessage('তথ্য সফলভাবে যোগ হয়েছে!');
+        }
+
+        function deleteItem(category, id) {
+            if (confirm('এটি মুছে ফেলতে নিশ্চিত?')) {
+                appData[category] = appData[category].filter(item => item.id !== id);
+                saveData();
+                displayData();
+                showSuccessMessage('তথ্য সফলভাবে মুছে ফেলা হয়েছে!');
+            }
+        }
+
+        function displayData() {
+            const category = document.getElementById('category').value;
+            const data = appData[category] || [];
+            const list = document.getElementById('data-list');
+
+            list.innerHTML = data.length ? data.map(item => `
+                <div class="data-item">
+                    <div class="data-item-content">
+                        <strong>${item.name || item.title || item.position || item.service || 'আইটেম'}</strong>
+                        <br>
+                        <small style="color: #999;">${JSON.stringify(item).substring(0, 60)}...</small>
+                    </div>
+                    <button class="button danger" onclick="deleteItem('${category}', ${item.id})">মুছুন</button>
+                </div>
+            `).join('') : '<div class="empty-state">এই বিভাগে কোনো তথ্য নেই</div>';
+        }
+
+        function clearForm() {
+            document.querySelectorAll('#form-fields input').forEach(input => input.value = '');
+        }
+
+        function saveData() {
+            localStorage.setItem('gramData', JSON.stringify(appData));
+        }
+
+        function toggleAdmin() {
+            switchSection('admin');
+        }
+
+        function showSuccessMessage(message) {
+            const messageDiv = document.getElementById('success-message');
+            messageDiv.innerHTML = `<div class="success-message">${message}</div>`;
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 3000);
+        }
+
+        // প্রাথমিক লোড
+        updateForm();
+        renderContent('news');
+
+        // প্রতি ২ সেকেন্ডে রিফ্রেশ (রিয়েল-টাইম আপডেট)
+        setInterval(() => {
+            const sections = ['news', 'health', 'education', 'jobs', 'agriculture', 'government', 'donors'];
+            sections.forEach(section => {
+                if (currentSection === section && currentSection !== 'admin') {
+                    renderContent(section);
+                }
+            });
+        }, 2000);
+    </script>
+</body>
+</html>
